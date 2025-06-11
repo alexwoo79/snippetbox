@@ -17,12 +17,18 @@ type application struct {
 }
 
 func main() {
+	// flag args define ,addr is address of server
+	// dsn database connection string
 	addr := flag.String("addr", ":4000", "Http network address")
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
+
 	// logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	// To keep the main() function tidy I've put the code for creating a connection // pool into the separate openDB() function below. We pass openDB() the DSN // from the command-line flag.
+
+	// To keep the main() function tidy I've put the code for creating a connection
+	// pool into the separate openDB() function below. We pass openDB() the DSN
+	// from the command-line flag.
 
 	db, err := openDB(*dsn)
 	if err != nil {
@@ -32,23 +38,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	// We also defer a call to db.Close(), so that the connection pool is closed // before the main() function exits.
+	// We also defer a call to db.Close(), so that the connection pool is closed
+	//  before the main() function exits.
 
 	defer db.Close()
+
 	app := &application{
 		logger:   logger,
 		snippets: &models.SnippetModel{DB: db},
 	}
 
 	logger.Info("Starting server", "addr", *addr)
+
 	// using the http.ListenAndServe() function to start a new web server
 	// port and mux
+	//
 	err = http.ListenAndServe(*addr, app.routes())
 	logger.Error(err.Error())
 	os.Exit(1)
 }
 
-// The openDB() function wraps sql.Open() and returns a sql.DB connection pool // for a given DSN.
+// The openDB() function wraps sql.Open() and returns a sql.DB connection pool
+//  for a given DSN.
 
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
