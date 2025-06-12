@@ -6,14 +6,16 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"text/template"
 
 	"github.com/alexwoo79/snippetbox/internal/models"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
-	logger   *slog.Logger
-	snippets *models.SnippetModel
+	logger        *slog.Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -23,12 +25,8 @@ func main() {
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
-	// logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-
-	// To keep the main() function tidy I've put the code for creating a connection
-	// pool into the separate openDB() function below. We pass openDB() the DSN
-	// from the command-line flag.
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	// logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	db, err := openDB(*dsn)
 	if err != nil {
@@ -37,15 +35,18 @@ func main() {
 
 		os.Exit(1)
 	}
-
-	// We also defer a call to db.Close(), so that the connection pool is closed
-	//  before the main() function exits.
-
 	defer db.Close()
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+
 	app := &application{
-		logger:   logger,
-		snippets: &models.SnippetModel{DB: db},
+		logger:        logger,
+		snippets:      &models.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 
 	logger.Info("Starting server", "addr", *addr)
