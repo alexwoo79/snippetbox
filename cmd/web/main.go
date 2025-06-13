@@ -9,7 +9,7 @@ import (
 	"text/template"
 
 	"github.com/alexwoo79/snippetbox/internal/models"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type application struct {
@@ -22,8 +22,11 @@ func main() {
 	// flag args define ,addr is address of server
 	// dsn database connection string
 	addr := flag.String("addr", ":4000", "Http network address")
-	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
-	flag.Parse()
+	// dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
+
+	// 修改为：
+	dsn := flag.String("dsn", "./Snippets.db", "SQLite database file")
+	flag.Parse() //
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	// logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -63,7 +66,7 @@ func main() {
 //  for a given DSN.
 
 func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}

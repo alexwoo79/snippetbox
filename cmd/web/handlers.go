@@ -60,7 +60,11 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	// Create some variables holding dummy data. We'll remove these later on // during the build.
 
 	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
+	content := `O snail
+	Climb Mount Fuji,
+	But slowly, slowly!
+
+	– Kobayashi Issa`
 	expires := 7
 
 	// Pass the data to the SnippetModel.Insert() method, receiving the // ID of the new record back.
