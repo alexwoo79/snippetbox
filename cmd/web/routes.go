@@ -2,9 +2,11 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/justinas/alice"
 )
 
-func (app *application) routes() *http.ServeMux {
+func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
@@ -23,5 +25,8 @@ func (app *application) routes() *http.ServeMux {
 	// create the new route ,which is restrict to Post Request only
 	mux.HandleFunc("POST /snippet/create", app.snippetCreatePost)
 
-	return mux
+	// using alice to chain the middleware
+	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+
+	return standard.Then(mux)
 }

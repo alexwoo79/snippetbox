@@ -13,7 +13,7 @@ import (
 // define a home handler fuch which write a byte slice containing.
 // hello from snippetbox as the response body
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("server", "go")
+	// panic("Oops! something went wrong")
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, r, err)
