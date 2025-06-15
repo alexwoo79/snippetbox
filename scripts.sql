@@ -50,3 +50,12 @@ CREATE USER 'web'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON snippetbox.* TO 'web'@'localhost';
 
 ALTER USER 'web'@'localhost' IDENTIFIED BY 'pass';
+
+USE snippetbox;
+
+create table sessions(
+token CHAR(43) PRIMARY KEY,
+data BLOB NOT NULL,
+expiry TIMESTAMP(6) NOT NULL
+);
+create index sessions_expiry_idx ON sessions (expiry);

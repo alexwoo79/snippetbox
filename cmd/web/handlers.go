@@ -56,6 +56,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	data.Snippet = snippet
 
 	// Use the new render helper in helpers.go
+	//
 	app.render(w, r, http.StatusOK, "view.tmpl", data)
 }
 
@@ -101,6 +102,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 	// Redirect the user to the relevant page for the snippet.
 
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
