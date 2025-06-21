@@ -4,21 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-
-	"github.com/justinas/nosurf"
 )
-
-func noSurf(next http.Handler) http.Handler {
-	csrfHandler := nosurf.New(next)
-	csrfHandler.SetBaseCookie(http.Cookie{
-		HttpOnly: true,
-		Path:     "/",
-		Secure:   false, // 改为 false 以支持 HTTP 测试环境
-		Domain:   "",    // 可选：指定 Cookie 的作用域
-		MaxAge:   0,     // 可选：设置 Cookie 的生命周期
-	})
-	return csrfHandler
-}
 
 func commonHeaders(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
