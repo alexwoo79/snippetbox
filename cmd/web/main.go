@@ -13,7 +13,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/alexwoo79/snippetbox/internal/models"
 	"github.com/go-playground/form/v4"
-	_ "github.com/mattn/go-sqlite3" // 替换为sqlite3驱动
+	_ "modernc.org/sqlite"
 )
 
 type application struct {
@@ -83,7 +83,7 @@ func main() {
 // The openDB() function wraps sql.Open() and returns a sql.DB connection pool
 // for a given DSN.
 func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", dsn) // 修改为sqlite3驱动
+	db, err := sql.Open("sqlite", dsn) // 修改为sqlite驱动
 	if err != nil {
 		return nil, err
 	}
