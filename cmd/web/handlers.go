@@ -121,6 +121,13 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
 
+// add an about handler function
+func (app *application) about(w http.ResponseWriter, r *http.Request) {
+	// fmt.Fprintln(w, "About Page")
+	data := app.newTemplateData(r)
+	app.render(w, r, http.StatusOK, "about.tmpl", data)
+}
+
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Form = userSignupForm{}

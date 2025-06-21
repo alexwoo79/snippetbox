@@ -17,7 +17,9 @@ func (app *application) routes() http.Handler {
 
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
-	// mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
+	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
+
+	mux.Handle("GET /about", dynamic.ThenFunc(app.about))
 
 	mux.Handle("GET /snippet/view/{id}", dynamic.ThenFunc(app.snippetView))
 
@@ -31,7 +33,7 @@ func (app *application) routes() http.Handler {
 
 	protected := dynamic.Append(app.requireAuthentication)
 
-	mux.Handle("GET /{$}", protected.ThenFunc(app.home))
+	// mux.Handle("GET /{$}", protected.ThenFunc(app.home))
 	mux.Handle("GET /snippet/create", protected.ThenFunc(app.snippetCreate))
 
 	mux.Handle("POST /snippet/create", protected.ThenFunc(app.snippetCreatePost))
