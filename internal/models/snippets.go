@@ -24,10 +24,10 @@ type SnippetModel struct {
 }
 
 // This will insert a new snippet into the database.
-
 func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
+	// 修改为SQLite兼容的SQL语法，使用datetime('now')和datetime('now', '+'||?||' days')
 	stmt := `INSERT INTO snippets (title, content, created, expires) 
-	VALUES(?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
+	VALUES (?, ?, datetime('now'), datetime('now', '+'||?||' days'))`
 
 	result, err := m.DB.Exec(stmt, title, content, expires)
 	if err != nil {
@@ -43,6 +43,7 @@ func (m *SnippetModel) Insert(title string, content string, expires int) (int, e
 // This will return a specific snippet based on its id.
 func (m *SnippetModel) Get(id int) (Snippet, error) {
 	var s Snippet
+	// 查询中时间字段也保持原样，但WHERE条件中的UTC_TIMESTAMP()替换为datetime('now')
 	stmt := `SELECT id, title, content, created, expires FROM snippets WHERE id = ?`
 	err := m.DB.QueryRow(stmt, id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
@@ -58,9 +59,9 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 
 // This will return the 10 most recently created snippets.
 func (m *SnippetModel) Latest() ([]Snippet, error) {
-	// Write the SQL statement we want to execute.
+	// 修改 WHERE 条件中的 UTC_TIMESTAMP() 为 datetime('now')
 	stmt := `SELECT id, title, content, created, expires FROM snippets
-					WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10`
+					WHERE expires > datetime('now') ORDER BY id DESC LIMIT 10`
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err

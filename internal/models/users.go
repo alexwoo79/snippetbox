@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -50,16 +49,16 @@ func (m *UserModel) Insert(name, email, password string) error {
 	if err != nil {
 		return err
 	}
-	stmt := `INSERT INTO users (name, email, hashed_password,created)
-					VALUES(?,?,?,UTC_TIMESTAMP())`
+	// 修改为SQLite兼容的SQL语法，使用datetime('now')
+	stmt := `INSERT INTO users (name, email, hashed_password, created)
+					VALUES(?,?,?,datetime('now'))`
 	_, err = m.DB.Exec(stmt, name, email, string(HashedPassword))
 	if err != nil {
-		var mySQLError *mysql.MySQLError
-		if errors.As(err, &mySQLError) {
-			if mySQLError.Number == 1062 && strings.Contains(mySQLError.Message, "users_uc_email") {
-				return ErrDuplicateEmail
-			}
+		// 删除了MySQL特定的错误处理代码
+		if strings.Contains(err.Error(), "UNIQUE constraint failed: users.email") {
+			return ErrDuplicateEmail
 		}
+		return err
 	}
 	return nil
 }
