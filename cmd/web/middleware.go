@@ -13,20 +13,26 @@ func noSurf(next http.Handler) http.Handler {
 	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   true,
+		Secure:   false, // 改为 false 以支持 HTTP 测试环境
+		Domain:   "",    // 可选：指定 Cookie 的作用域
+		MaxAge:   0,     // 可选：设置 Cookie 的生命周期
 	})
 	return csrfHandler
 }
 
 func commonHeaders(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		//  Execute our middleware logic here...
-		w.Header().Set("Content-Security-Policy", "default-src 'self';")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline';")
 		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "deny")
 		w.Header().Set("X-XSS-Protection", "0")
 		w.Header().Set("Server", "Go")
+
+		// 添加缓存控制策略，避免浏览器缓存旧页面内容
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
 
 		next.ServeHTTP(w, r)
 	}

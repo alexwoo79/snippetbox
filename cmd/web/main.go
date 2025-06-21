@@ -27,7 +27,6 @@ type application struct {
 
 func main() {
 	// flag args define ,addr is address of server
-	// dsn database connection string
 	addr := flag.String("addr", ":4000", "Http network address")
 	dsn := flag.String("dsn", "./snippetbox.db?cache=shared&mode=rwc", "SQLite data source name") // 修改为SQLite数据库文件路径
 	flag.Parse()
@@ -51,9 +50,9 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	sessionManager.Store = sqlite3store.New(db) // 使用sqlite3的session存储
+	sessionManager.Store = sqlite3store.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
-	sessionManager.Cookie.Secure = true
+	sessionManager.Cookie.Secure = false // 改为 false 以支持 HTTP 测试环境
 
 	app := &application{
 		logger:         logger,
