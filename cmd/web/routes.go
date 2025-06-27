@@ -32,7 +32,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /user/login", dynamic.ThenFunc(app.userLoginPost))
 
 	protected := dynamic.Append(app.requireAuthentication)
-
+	mux.Handle("GET /public/", protected.Then(http.FileServerFS(ui.PublicFiles)))
 	// mux.Handle("GET /{$}", protected.ThenFunc(app.home))
 	mux.Handle("GET /snippet/create", protected.ThenFunc(app.snippetCreate))
 
